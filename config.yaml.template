@@ -1,0 +1,119 @@
+# Granola Sync Configuration Template
+# Central configuration for all Granola transcript sync settings
+#
+# NOTE: The vault path below will be filled in during installation.
+# You can manually edit this file to customize sync behavior.
+
+# API Configuration [REQUIRED - Do not modify]
+api:
+  base_url: "https://api.granola.ai"
+  endpoints:
+    documents: "/v2/get-documents"
+    document_lists: "/v2/get-document-lists"
+    transcript: "/v1/get-document-transcript"
+
+  # Rate limiting [optional - most users should not modify]
+  request_delay: 0.1  # seconds between requests
+  batch_size: 50      # documents per API call
+  max_retries: 3      # retry attempts for failed requests
+  timeout: 30         # request timeout in seconds
+
+# File Paths [Some are REQUIRED, others are optional]
+paths:
+  # Granola app data [REQUIRED - points to Granola app's local storage]
+  credentials: "~/Library/Application Support/Granola/supabase.json"
+  user_preferences: "~/Library/Application Support/Granola/user-preferences.json"
+
+  # Sync data [optional - you can change these paths if desired]
+  last_sync_file: "~/.granola_last_sync"
+  document_mapping: "./tools/granola/data/document_to_list_mapping.json"
+
+  # Output [REQUIRED - where your meeting notes will be saved]
+  obsidian_vault: "{{OBSIDIAN_VAULT_PATH}}"
+  log_directory: "./tools/granola/logs"
+
+  # Archive/backup [optional - stores mapping backups]
+  backup_directory: "./tools/granola/backups"
+
+# Sync Behavior [optional - customize for your preferences]
+sync:
+  # Default lookback when no last sync file exists (first run only)
+  default_lookback_days: 7
+
+  # File handling
+  update_existing_files: true   # update notes if meeting was modified
+  create_backup_before_update: false  # backup old version before updating
+
+  # Content processing
+  skip_empty_transcripts: false  # include meetings with no transcript
+  include_raw_data: false        # include raw API data for debugging
+
+  # Participant detection - used if participants cannot be determined
+  fallback_participants: ["Me", "Them"]
+
+# Document Processing [optional - customize output format]
+documents:
+  # Filename generation
+  safe_filename_pattern: '[^\w\s-]'
+  filename_format: "{date}-{title}.md"  # Include date in filename
+  max_filename_length: 255
+
+  # Content formatting - section headers in your notes
+  transcript_section_header: "## Transcript"
+  notes_section_header: "## Notes"
+  no_transcript_message: "*[No transcript content available]*"
+
+# Obsidian Integration [optional - customize frontmatter fields]
+obsidian:
+  # YAML frontmatter fields included in each note
+  frontmatter_fields:
+    - title
+    - date
+    - participants
+    - granola_id
+    - created_at
+    - updated_at
+    - source
+    - document_list      # optional
+    - document_list_id   # optional
+
+  # Content structure
+  include_meeting_series: true   # show which series each meeting belongs to
+  include_participant_count: false
+
+# Data Management [optional - control mapping and backup behavior]
+data:
+  # Mapping refresh behavior
+  mapping_max_age_hours: 24  # refresh participant mapping if older than 24h
+  auto_refresh_mapping: true # automatically refresh stale mappings
+  validate_api_responses: true
+
+  # Backup behavior - stores old mappings for 30 days
+  auto_backup_mapping: true
+  backup_retention_days: 30
+
+# Logging [optional - control log output verbosity]
+logging:
+  level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  max_log_files: 30  # keep this many old log files
+  log_file_format: "granola_sync_{timestamp}.log"
+  include_timestamps: true
+
+# Error Handling [optional - control sync robustness]
+error_handling:
+  # What to do if something goes wrong
+  continue_on_document_error: true   # skip failed documents, keep going
+  continue_on_transcript_error: true # save note even if transcript fails
+  continue_on_mapping_error: false   # stop if participant mapping fails
+
+  # Retry behavior for API errors
+  retry_exponential_backoff: true
+  retry_base_delay: 1.0  # seconds
+  retry_max_delay: 60.0  # seconds (max delay between retries)
+
+# Development/Testing [optional - usually leave as-is]
+development:
+  dry_run: false  # set to true to preview changes without saving
+  verbose_output: false
+  save_debug_data: false
+  mock_api_responses: false

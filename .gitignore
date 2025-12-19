@@ -1,0 +1,33 @@
+# Credentials and sensitive data
+config.yaml
+*.json
+supabase.json
+
+# Runtime data
+data/
+logs/
+backups/
+.granola_last_sync
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+venv/
+env/
